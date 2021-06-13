@@ -1,0 +1,7 @@
+datashark:
+# ---------------------------------------------------------------------[SERVICE]
+  service:
+    bind: 127.0.0.1
+    port: 13740
+    user: user
+    pswd: AAi2x973jaqFiyVj
