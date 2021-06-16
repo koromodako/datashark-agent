@@ -7,13 +7,14 @@ from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
 from ds_core import BANNER
 from ds_core.api import Artifact
+from ds_core.yara import update_cached_yara_rules
 from ds_core.config import DSConfiguration, DEFAULT_CONFIG_PATH
 from ds_core.plugin import load_installed_plugins
 from ds_core.logging import LOGGING_MANAGER
-from ds_core.dispatcher import (
+from ds_core.dispatch import (
     DS_PLUGIN_JOBS,
     DS_DISPATCH_JOBS,
-    enqueue_dispatch,
+    dispatch,
 )
 from . import LOGGER
 
@@ -30,7 +31,7 @@ async def info(request):
 async def process(request):
     data = await request.json()
     obj = Artifact(data['filepath'])
-    job = enqueue_dispatch(obj)
+    job = dispatch(request.app['config'], obj)
     return web.json_response({'job': job.id})
 
 
@@ -51,9 +52,12 @@ def parse_args():
     return args
 
 
-def run(args):
+def run(args) -> int:
     LOGGING_MANAGER.set_debug(args.debug)
-    load_installed_plugins()
+    if not load_installed_plugins():
+        return 2
+    if not update_cached_yara_rules(args.config):
+        return 3
     auth = BasicAuthMiddleware(
         username=args.config.get('datashark.service.username', default='user'),
         password=args.config.get('datashark.service.password'),
@@ -70,6 +74,7 @@ def run(args):
     port = args.config.get('datashark.service.port', default=13740)
     LOGGER.info("starting on: %s:%s", bind, port)
     web.run_app(webapp, host=bind, port=port, handle_signals=True)
+    return 0
 
 
 def app():
@@ -78,7 +83,7 @@ def app():
     args = parse_args()
     exitcode = 0
     try:
-        run(args)
+        exitcode = run(args)
     except:
         LOGGER.exception("unexpected exception!")
         exitcode = 1
