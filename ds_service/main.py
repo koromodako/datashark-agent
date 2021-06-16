@@ -45,8 +45,8 @@ def run(args):
     LOGGING_MANAGER.set_debug(args.debug)
     load_installed_plugins()
     auth = BasicAuthMiddleware(
-        username=args.config.get('datashark', 'service', 'username', default='user'),
-        password=args.config.get('datashark', 'service', 'password'),
+        username=args.config.get('datashark.service.username', default='user'),
+        password=args.config.get('datashark.service.password'),
     )
     webapp = web.Application(middlewares=[auth])
     webapp['config'] = args.config
@@ -54,8 +54,8 @@ def run(args):
         web.get('/info', info),
         web.post('/process', process),
     ])
-    bind = args.config.get('datashark', 'service', 'bind', default='127.0.0.1')
-    port = args.config.get('datashark', 'service', 'port', default=13740)
+    bind = args.config.get('datashark.service.bind', default='127.0.0.1')
+    port = args.config.get('datashark.service.port', default=13740)
     LOGGER.info("starting on: %s:%s", bind, port)
     web.run_app(webapp, host=bind, port=port, handle_signals=True)
 
