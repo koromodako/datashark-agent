@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 from argparse import ArgumentParser
+from yarl import URL
 from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
 from ds_core import BANNER
@@ -30,8 +31,23 @@ async def info(request):
 
 async def process(request):
     data = await request.json()
-    obj = Artifact(data['filepath'])
-    job = dispatch(request.app['config'], obj)
+    filepath = data.get('filepath')
+    if not filepath:
+        raise web.HTTPBadRequest(
+            reason="filepath must be specified by client.",
+        )
+    filepath = Path(filepath)
+    if not filepath.is_absolute() or not filepath.is_file():
+        raise web.HTTPBadRequest(
+            reason="filepath must be the absolute path of a regular file.",
+        )
+    url = URL.build(
+        scheme='file',
+        host=Artifact.LOCALHOST,
+        path=data['filepath']
+    )
+    artifact = Artifact(url)
+    job = dispatch(request.app['config'], artifact)
     return web.json_response({'job': job.id})
 
 
