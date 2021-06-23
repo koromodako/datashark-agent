@@ -42,9 +42,7 @@ async def process(request):
             reason="filepath must be the absolute path of a regular file.",
         )
     url = URL.build(
-        scheme='file',
-        host=Artifact.LOCALHOST,
-        path=data['filepath']
+        scheme='file', host=Artifact.LOCALHOST, path=data['filepath']
     )
     artifact = Artifact(url)
     job = dispatch(request.app['config'], artifact)
