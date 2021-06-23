@@ -8,9 +8,9 @@ from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
 from ds_core import BANNER
 from ds_core.api import Artifact
+from ds_core.meta import load_plugins
 from ds_core.yara import update_cached_yara_rules
 from ds_core.config import DSConfiguration, DEFAULT_CONFIG_PATH
-from ds_core.plugin import load_installed_plugins
 from ds_core.logging import LOGGING_MANAGER
 from ds_core.dispatch import (
     DS_PLUGIN_JOBS,
@@ -70,7 +70,7 @@ def parse_args():
 
 def run(args) -> int:
     LOGGING_MANAGER.set_debug(args.debug)
-    if not load_installed_plugins():
+    if not load_plugins():
         return 2
     if not update_cached_yara_rules(args.config):
         return 3
