@@ -13,8 +13,9 @@ from ds_core.yara import update_cached_yara_rules
 from ds_core.config import DSConfiguration, DEFAULT_CONFIG_PATH
 from ds_core.logging import LOGGING_MANAGER
 from ds_core.dispatch import (
-    DS_PLUGIN_JOBS,
     DS_DISPATCH_JOBS,
+    DS_PLUGIN_JOBS,
+    DS_CLEANUP_JOBS,
     dispatch,
 )
 from . import LOGGER
@@ -23,8 +24,9 @@ from . import LOGGER
 async def info(request):
     return web.json_response(
         {
-            'plugin_job_count': len(DS_PLUGIN_JOBS.job_ids),
-            'dispatch_job_count': len(DS_DISPATCH_JOBS.job_ids),
+            'dispatch_jobs': len(DS_DISPATCH_JOBS.job_ids),
+            'plugin_jobs': len(DS_PLUGIN_JOBS.job_ids),
+            'cleanup_jobs': len(DS_DISPATCH_JOBS.job_ids),
         }
     )
 
