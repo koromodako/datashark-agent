@@ -1,4 +1,4 @@
-# datashark-service
+# datashark-agent
 
 ## Purpose
 

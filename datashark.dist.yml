@@ -1,6 +1,8 @@
 datashark:
-  service: #-----------------------------------------------------------[SERVICE]
+  agent: #-----------------------------------------------------------[SERVICE]
+    ca: /opt/datashark/ssl/cli-ca-cert.pem
+    key: /opt/datashark/ssl/agent-key.pem
+    cert: /opt/datashark/ssl/agent-cert.pem
     bind: 127.0.0.1
     port: 13740
-    username: user
-    password: AAi2x973jaqFiyVj
+
