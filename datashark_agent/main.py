@@ -9,6 +9,10 @@ from datashark_core import BANNER
 from datashark_core.meta import load_processors
 from datashark_core.config import DatasharkConfiguration, override_arg
 from datashark_core.logging import LOGGING_MANAGER
+from datashark_core.model.database import (
+    init_database_model,
+    init_database_engine,
+)
 from . import LOGGER
 from .route import setup as setup_routes
 
@@ -17,12 +21,6 @@ def parse_args():
     parser = ArgumentParser(description="Datashark Service")
     parser.add_argument(
         '--debug', '-d', action='store_true', help="Enable debugging"
-    )
-    parser.add_argument(
-        '--config',
-        '-c',
-        type=DatasharkConfiguration,
-        help="Configuration file",
     )
     parser.add_argument('--bind', '-b', help="Address to listen on")
     parser.add_argument('--port', '-p', type=int, help="Port to listen on")
@@ -33,6 +31,9 @@ def parse_args():
         '--ask-pass',
         action='store_true',
         help="Ask for server private key password",
+    )
+    parser.add_argument(
+        'config', type=DatasharkConfiguration, help="Configuration file"
     )
     args = parser.parse_args()
     args.bind = override_arg(
@@ -81,10 +82,14 @@ def app():
     LOGGER.info("loading processors...")
     if not load_processors():
         return
+    # initialize database
+    engine = init_database_engine(args.config)
+    init_database_model(engine)
     # create web application instance
     webapp = web.Application()
     # set webapp variables
     webapp['config'] = args.config
+    webapp['engine'] = engine
     # setup web application route handlers
     setup_routes(webapp)
     # create ssl context
