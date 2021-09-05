@@ -22,12 +22,10 @@ async def processors(request):
         processor_classes.append(processor_class)
     if not processor_classes:
         raise web.HTTPNotFound()
-    proc_resp = ProcessorsResponse.build({
-        'processors': [
-            processor_class.processor()
-            for processor_class in processor_classes
-        ]
-    })
+    proc_resp = ProcessorsResponse(processors=[
+        processor_class.processor()
+        for processor_class in processor_classes
+    ])
     return web.json_response(proc_resp.as_dict())
 
 

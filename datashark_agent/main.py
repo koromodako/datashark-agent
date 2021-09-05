@@ -42,35 +42,38 @@ def parse_args():
     args.port = override_arg(
         args.port, args.config, 'datashark.agent.port', default=13740
     )
-    args.ca = Path(override_arg(
-        args.ca,
-        args.config,
-        'datashark.agent.ca',
-        input("Enter CLI CA certificate path: ")
-    ))
-    if not args.ca.is_file():
-        LOGGER.error("You must provide a valid CLI CA certificate path!")
-        return None
-    args.key = Path(override_arg(
-        args.key,
-        args.config,
-        'datashark.agent.key',
-        input("Enter agent key path: ")
-    ))
-    if not args.key.is_file():
-        LOGGER.error("You must provide a valid agent private key path!")
-        return None
-    args.cert = Path(override_arg(
-        args.cert,
-        args.config,
-        'datashark.agent.cert',
-        input("Enter agent cert path: ")
-    ))
-    if not args.cert.is_file():
-        LOGGER.error("You must provide a valid agent certificate path!")
-        return None
+    args.ca = override_arg(args.ca, args.config, 'datashark.agent.ca')
+    if args.ca:
+        args.ca = Path(args.ca)
+    args.key = override_arg(args.key, args.config, 'datashark.agent.key')
+    if args.key:
+        args.key = Path(args.key)
+    args.cert = override_arg(args.cert, args.config, 'datashark.agent.cert')
+    if args.cert:
+        args.cert = Path(args.cert)
     return args
 
+def prepare_ssl_context(args):
+    """Prepare SSL context"""
+    if not args.ca or not args.key or not args.cert:
+        return None
+    LOGGER.info("preparing SSL context...")
+    # create ssl context
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    # enforce client certificate validation
+    ssl_context.verify_mode = ssl.CERT_REQUIRED
+    # load server certificate
+    password = None
+    if args.ask_pass:
+        password = getpass("Enter client private key password: ")
+    ssl_context.load_cert_chain(
+        certfile=str(args.cert),
+        keyfile=str(args.key),
+        password=password,
+    )
+    # load clients CA certificate
+    ssl_context.load_verify_locations(cafile=str(args.ca))
+    return ssl_context
 
 def app():
     """Application entry point"""
@@ -92,21 +95,8 @@ def app():
     webapp['engine'] = engine
     # setup web application route handlers
     setup_routes(webapp)
-    # create ssl context
-    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    # enforce client certificate validation
-    ssl_context.verify_mode = ssl.CERT_REQUIRED
-    # load server certificate
-    password = None
-    if args.ask_pass:
-        password = getpass("Enter client private key password: ")
-    ssl_context.load_cert_chain(
-        certfile=str(args.cert),
-        keyfile=str(args.key),
-        password=password,
-    )
-    # load clients CA certificate
-    ssl_context.load_verify_locations(cafile=str(args.ca))
+    # prepare ssl context if needed
+    ssl_context = prepare_ssl_context(args)
     # run webapp
     LOGGER.info("starting on: %s:%s", args.bind, args.port)
     web.run_app(
