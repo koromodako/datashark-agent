@@ -6,7 +6,7 @@ from datashark_core.model.api import AgentInfoResponse
 
 async def info(_):
     """GET /info implementation"""
-    return web.json_response(AgentInfoResponse.build({}).as_dict())
+    return web.json_response(AgentInfoResponse().as_dict())
 
 
 def setup(webapp):
