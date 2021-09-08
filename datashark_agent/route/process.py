@@ -13,9 +13,7 @@ async def process(request):
         raise web.HTTPNotFound()
     webapp = request.app
     processor_instance = processor_class(webapp['config'], webapp['engine'])
-    result = await processor_instance.run(
-        proc_req.filepath, proc_req.processor.arguments
-    )
+    result = await processor_instance.run(proc_req.processor.arguments)
     proc_resp = ProcessingResponse(result=result)
     return web.json_response(proc_resp.as_dict())
 
