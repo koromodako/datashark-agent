@@ -1,8 +1,8 @@
 datashark:
-  agent: #-----------------------------------------------------------[SERVICE]
+  agent: #--------------------------------------------------------------[AGENT]
     ca: /opt/datashark/ssl/ca-chain.cert.pem
     key: /opt/datashark/ssl/agent.key.pem
     cert: /opt/datashark/ssl/agent.cert.pem
     bind: 127.0.0.1
     port: 13740
-
+    workdir: /opt/datashark/share
