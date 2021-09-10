@@ -5,4 +5,4 @@ datashark:
     cert: /opt/datashark/ssl/agent.cert.pem
     bind: 127.0.0.1
     port: 13740
-    workdir: /opt/datashark/share
+    workdir: /opt/datashark/cases
