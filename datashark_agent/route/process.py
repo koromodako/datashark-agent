@@ -20,6 +20,8 @@ async def process(request):
 
 def setup(webapp):
     """Setup routes"""
-    webapp.add_routes([
-        web.post('/process', process),
-    ])
+    webapp.add_routes(
+        [
+            web.post('/process', process),
+        ]
+    )

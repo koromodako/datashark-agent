@@ -11,6 +11,8 @@ async def info(_):
 
 def setup(webapp):
     """Setup routes"""
-    webapp.add_routes([
-        web.get('/info', info),
-    ])
+    webapp.add_routes(
+        [
+            web.get('/info', info),
+        ]
+    )

@@ -53,6 +53,7 @@ def parse_args():
         args.cert = Path(args.cert)
     return args
 
+
 def prepare_ssl_context(args):
     """Prepare SSL context"""
     if not args.ca or not args.key or not args.cert:
@@ -74,6 +75,7 @@ def prepare_ssl_context(args):
     # load clients CA certificate
     ssl_context.load_verify_locations(cafile=str(args.ca))
     return ssl_context
+
 
 def app():
     """Application entry point"""
