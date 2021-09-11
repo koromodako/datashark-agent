@@ -9,6 +9,7 @@ from datashark_core import BANNER
 from datashark_core.meta import load_processors
 from datashark_core.config import DatasharkConfiguration, override_arg
 from datashark_core.logging import LOGGING_MANAGER
+from datashark_core.filesystem import get_workdir
 from datashark_core.model.database import (
     init_database_model,
     init_database_engine,
@@ -100,6 +101,12 @@ def app():
     setup_routes(webapp)
     # prepare ssl context if needed
     ssl_context = prepare_ssl_context(args)
+    # check workdir
+    try:
+        LOGGER.info("working directory: %s", get_workdir())
+    except ValueError as exc:
+        LOGGER.critical(str(exc))
+        return
     # run webapp
     LOGGER.info("starting on: %s:%s", args.bind, args.port)
     web.run_app(
