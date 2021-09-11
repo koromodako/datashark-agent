@@ -89,7 +89,8 @@ def app():
         return
     # initialize database
     engine = init_database_engine(args.config)
-    init_database_model(engine)
+    if not init_database_model(engine):
+        return
     # create web application instance
     webapp = web.Application()
     # set webapp variables
