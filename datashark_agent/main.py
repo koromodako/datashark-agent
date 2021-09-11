@@ -103,7 +103,7 @@ def app():
     ssl_context = prepare_ssl_context(args)
     # check workdir
     try:
-        LOGGER.info("working directory: %s", get_workdir())
+        LOGGER.info("working directory: %s", get_workdir(args.config))
     except ValueError as exc:
         LOGGER.critical(str(exc))
         return
