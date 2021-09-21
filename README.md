@@ -1,15 +1,5 @@
-# datashark-agent
+# Datashark Agent
 
-## Purpose
+This is datashark agent.
 
-This is the job orchestrator for datashark.
-
-## Requirements
-
-* Python 3.9+
-
-## Building this package
-
-```bash
-python3 -m build
-```
+See [the documentation](https://koromodako.github.io/datashark/) to learn more about Datashark project.
