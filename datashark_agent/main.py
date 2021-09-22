@@ -4,6 +4,7 @@ import ssl
 from pathlib import Path
 from getpass import getpass
 from argparse import ArgumentParser
+from functools import partial
 from aiohttp import web
 from datashark_core import BANNER
 from datashark_core.meta import load_processors
@@ -28,11 +29,6 @@ def parse_args():
     parser.add_argument('--ca', help="Clients CA certificate")
     parser.add_argument('--key', help="Server private key")
     parser.add_argument('--cert', help="Server certificate")
-    parser.add_argument(
-        '--ask-pass',
-        action='store_true',
-        help="Ask for server private key password",
-    )
     parser.add_argument(
         'config', type=DatasharkConfiguration, help="Configuration file"
     )
@@ -65,13 +61,10 @@ def prepare_ssl_context(args):
     # enforce client certificate validation
     ssl_context.verify_mode = ssl.CERT_REQUIRED
     # load server certificate
-    password = None
-    if args.ask_pass:
-        password = getpass("Enter client private key password: ")
     ssl_context.load_cert_chain(
         certfile=str(args.cert),
         keyfile=str(args.key),
-        password=password,
+        password=partial(getpass, "Enter private key password: "),
     )
     # load clients CA certificate
     ssl_context.load_verify_locations(cafile=str(args.ca))
