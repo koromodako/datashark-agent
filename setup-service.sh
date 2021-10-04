@@ -1,9 +1,14 @@
+#!/usr/bin/env bash
+
+cat << "EOF" > /etc/systemd/system/datashark.service
 [Unit]
 Description=Datashark Agent
 After=network.target
 
 [Service]
 Type=simple
+User=datashark
+Group=datashark
 WorkingDirectory=/opt/datashark/
 Environment=LANG=en_US.UTF-8
 Environment=LC_ALL=en_US.UTF-8
@@ -16,3 +21,5 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+EOF
+systemctl enable datashark.service

@@ -9,7 +9,7 @@ from aiohttp import web
 from datashark_core import BANNER
 from datashark_core.meta import load_processors
 from datashark_core.config import DatasharkConfiguration, override_arg
-from datashark_core.logging import LOGGING_MANAGER
+from datashark_core.logging import LOGGING_MANAGER, setup_logging
 from datashark_core.filesystem import get_workdir
 from datashark_core.model.database import (
     init_database_model,
@@ -24,6 +24,9 @@ def parse_args():
     parser.add_argument(
         '--debug', '-d', action='store_true', help="Enable debugging"
     )
+    parser.add_argument(
+        '--log-to', type=Path, help="Directory where logs will be stored"
+    )
     parser.add_argument('--bind', '-b', help="Address to listen on")
     parser.add_argument('--port', '-p', type=int, help="Port to listen on")
     parser.add_argument('--ca', help="Clients CA certificate")
@@ -33,6 +36,11 @@ def parse_args():
         'config', type=DatasharkConfiguration, help="Configuration file"
     )
     args = parser.parse_args()
+    args.log_to = override_arg(
+        args.log_to, args.config, 'datashark.agent.log_to'
+    )
+    if args.log_to:
+        args.log_to /= 'datashark-agent.log'
     args.bind = override_arg(
         args.bind, args.config, 'datashark.agent.bind', default='127.0.0.1'
     )
@@ -73,9 +81,11 @@ def prepare_ssl_context(args):
 
 def app():
     """Application entry point"""
-    LOGGER.info(BANNER)
     args = parse_args()
+    setup_logging(args.log_to)
     LOGGING_MANAGER.set_debug(args.debug)
+    # display banner
+    LOGGER.info(BANNER)
     LOGGER.debug("command line arguments: %s", args)
     # load processors
     LOGGER.info("loading processors...")
