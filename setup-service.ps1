@@ -1,9 +1,3 @@
-$params = @{
-  Name = "DatasharkAgent"
-  BinaryPathName = '"C:\Users\user\AppData\Local\Programs\Python\Python39\Scripts\datashark-agent.exe" --log-to "C:\Users\user\AppData\Roaming\Datashark\Logs\" "C:\Users\user\AppData\Roaming\Datashark\datashark.yml"'
-  Credential = ".\user"
-  DisplayName = "Datashark Agent"
-  StartupType = "Automatic"
-  Description = "Datashak agent service"
-}
-New-Service @params
+$python = "Programs\Python\Python39\Scripts"
+$content = "%localappdata%\$python\datashark-agent.exe --log-to %appdata%\Datashark\Logs\ %appdata%\Datashark\datashark.yml"
+Set-Content -Path "$env:appdata\Microsoft\Windows\Start Menu\Programs\Startup\start-datashark-agent.cmd" -Value $content
